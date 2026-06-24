@@ -720,8 +720,7 @@ footer p {
 
     .infos-hero {
         justify-content: left;
-        margin-left: 200px;
-        margin-right: 120px;
+        margin: auto;
     }
 
     .hero-content {
