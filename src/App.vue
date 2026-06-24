@@ -341,9 +341,21 @@ const resetToHome = () => {
               
               <div class="first-part">
                 <div class="infos-format">
-                  <p><img src="@/assets/clock-icon.svg" alt="" aria-hidden="true" />{{ selectedAnimation.duree_episode }} min</p>
-                  <p>{{ selectedAnimation.nombre_episode }} épisodes</p>
-                  <p>{{ selectedAnimation.nombre_saisons }} Saison(s)</p>
+                  <p><img src="@/assets/clock-icon.svg" alt="" aria-hidden="true" />~{{ selectedAnimation.duree_episode }} min / episode</p>
+
+                  <p v-if="selectedAnimation.nombre_episode > 1 || !selectedAnimation.type_contenu?.some(t => ['court métrage', 'film'].includes(t.name.toLowerCase()))">
+                    {{ selectedAnimation.nombre_episode }} épisode{{ selectedAnimation.nombre_episode > 1 ? 's' : '' }}
+                  </p>
+
+                  <p v-if="!selectedAnimation.nombre_saisons || selectedAnimation.nombre_saisons == 0">
+                    {{ 
+                        selectedAnimation.type_contenu?.find(t => ['court métrage', 'film'].includes(t.name.toLowerCase()))?.name 
+                        || selectedAnimation.type_contenu?.[0]?.name 
+                        || 'Format inconnu' 
+                      }}
+                  </p>
+
+                  <p v-else>{{ selectedAnimation.nombre_saisons }} Saison{{ selectedAnimation.nombre_saisons > 1 ? 's' : '' }}</p>
                 </div>
 
                 
