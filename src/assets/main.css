@@ -95,6 +95,7 @@ nav {
 nav figure {
     margin: 0;
     padding: 0;
+    cursor: pointer;
 }
 
 nav figure img {
@@ -369,7 +370,8 @@ p.genre-tag {
 
 .button-card:hover{
     background-image: url('@/assets/multicolor_bg.gif');
-
+    background-size: cover;
+    color: var(--tertiary-color);
 }
 
 /*décalage cards*/
@@ -623,6 +625,7 @@ footer {
 footer figure {
     margin: 0;
     padding: 0;
+    cursor: pointer;
 }
 
 footer figure img {
