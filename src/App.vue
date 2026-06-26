@@ -323,7 +323,7 @@ const resetToHome = () => {
                   <div class="hero-content">
                     <h2>{{ selectedAnimation.titre }}</h2>
                     <p class="auteur">{{ selectedAnimation.auteur }}</p>
-                    <p>Orgine {{ selectedAnimation.origine_animation }}</p>
+                    <p>Origine {{ selectedAnimation.origine_animation }}</p>
                     <p class="detail-date"><span>{{ selectedAnimation.date_sortie }}</span></p>
                     <div class="hero-tag">
                       <p
