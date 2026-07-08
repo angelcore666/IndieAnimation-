@@ -6,6 +6,7 @@
  --primary-color: #000000;
  --secondary-color: #D300FF;
  --tertiary-color: #ffffff;
+ --important: #71ff71;
 }
 
 /*poppins*/
@@ -360,6 +361,7 @@ p.genre-tag {
 
 .button-card{
     background-color: var(--tertiary-color);
+    color: var(--primary-color);
     border: none;
     border-radius: 16px;
     font-family: "Poppins-Bold";
@@ -412,7 +414,7 @@ p.genre-tag {
     font-family: 'Poppins-Bold';
     font-size: 30px;
     margin: 0;
-    line-height: 1;
+    line-height: 1.2;
 }
 
 .detail-content h3{
@@ -445,6 +447,28 @@ p.genre-tag {
     margin-top: 15px;
     width: 100%;
     max-width: 250px;
+}
+
+.support-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.auteur {
+    font-family: 'Fira-bold', sans-serif;
+    color: var(--tertiary-color);
+    font-size: 18px;
+    gap: 10px;
+    display: flex;
+    align-items: center;
+
+  
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 5px;
+    width: fit-content;
+    border-radius: 5px;
 }
 
 .infos-hero p {
@@ -500,6 +524,38 @@ p.genre-tag {
 
 .detail-illustration img {
     width: 100%;
+}
+
+.support-btn {
+  background-color: var(--important);
+
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  width: fit-content;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.support-btn a {
+  color: var(--primary-color);
+  font-family: 'Poppins-Bold', sans-serif;
+  text-decoration: none;
+}
+
+.creator-link {
+  background-color: var(--secondary-color);
+
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  width: fit-content;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.creator-link a {
+  color: var(--tertiary-color);
+  font-family: 'Poppins-Bold', sans-serif;
+  text-decoration: none;
 }
 
 .detail-date::before {
@@ -633,11 +689,29 @@ footer figure img {
     height: auto;
 }
 
+.nav-btn-infos {
+    text-align: center;
+    text-decoration: Underline;
+    color: var(--tertiary-color);
+    width: 100%;
+
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-btn-infos:hover {
+    color: var(--secondary-color);
+}
+
 footer p {
     margin: 10px;
     font-family: 'Fira-medium', sans-serif;
     font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
 }
+
 
 
 /*PC responsive*/
@@ -688,6 +762,22 @@ footer p {
 
         padding: 0 40px;
     }
+
+    .nav-btn-infos {
+        text-align: right;
+    }
+
+    footer p {
+        margin: 10px;
+        font-family: 'Fira-medium', sans-serif;
+        font-size: 14px;
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        flex-wrap: wrap;
+        
+    }
+
 
     .btn-back {
         left: -30px;

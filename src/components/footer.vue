@@ -5,7 +5,9 @@
         @click="$emit('go-home')">
         <img src="@/assets/logo-indieanimation.png" alt="IndieAnimation" class="logo-footer">
       </figure>
-      <p>©2026 IndieAnimation+</p>
+      <p><RouterLink to="/infos" class="nav-btn-infos">
+          Infos
+        </RouterLink>©2026 IndieAnimation+</p>
    </footer>
    
 </template>

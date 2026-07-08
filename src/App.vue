@@ -3,6 +3,10 @@ import { ref, onMounted, computed, nextTick } from 'vue'
 import axios from 'axios'
 import indieheader from '@/components/header.vue'
 import indiefooter from '@/components/footer.vue'
+import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+const $route = useRoute()
+const $router = useRouter() 
 //import of things like components
 
 
@@ -122,7 +126,6 @@ const listGenres = computed(() => {
 const selectAnimation = (animation) => {
   window.scrollTo({top: 0,}) //puts back to the top
 
-  console.log("animation sélectionnée ", animation.titre) // avoid getting pranked
   selectedAnimation.value = animation //store the obj directly
 }
 
@@ -209,6 +212,7 @@ const getEmbedUrl = (url) => {
 const resetToHome = () => {
   window.scrollTo({ top: 0,})
   selectedAnimation.value = null
+  $router.push('/')
 }
 
 
@@ -222,9 +226,11 @@ const resetToHome = () => {
 <template>
  <main>
 
-    <indieheader :is-detail-view="selectedAnimation !== null" @go-home="resetToHome"/>
-      
-    <div v-if="!selectedAnimation" key="home-page">
+    <indieheader v-if="$route.path !== '/infos'" :is-detail-view="selectedAnimation !== null" @go-home="resetToHome"/>
+
+    <RouterView v-if="$route.path === '/infos'" />
+
+    <div v-else-if="!selectedAnimation" key="home-page">
 
       <div class="general-search">
       <!-- search part-->
@@ -276,8 +282,10 @@ const resetToHome = () => {
                       
                       <h3 @click="index === 0 ? cycleStack() : null" 
                       style="cursor: pointer;" >{{ animation.titre }}</h3>
+
+                      <p v-if="!animation.date_sortie || animation.date_sortie === '0'" class="date-tag"><img src="@/assets/calendar-icon.svg" alt="Calendar" /><span>Date inconnue</span></p>
                       
-                      <p class="date-tag"><img src="@/assets/calendar-icon.svg" alt="Calendar" /><span>{{animation.date_sortie}}</span></p>
+                      <p v-else class="date-tag"><img src="@/assets/calendar-icon.svg" alt="Calendar" /><span>{{animation.date_sortie}}</span></p>
                       
                       <div class="tags-container">
                         <p class="genre-tag"
@@ -314,44 +322,62 @@ const resetToHome = () => {
 
             <div class="details">
               <div class="infos-hero">
-                  <img 
-                    v-if="selectedAnimation.illustration" 
-                    :src="selectedAnimation.illustration.url" 
-                    :alt="selectedAnimation.titre" 
-                    class="detail-illustration"
-                  >
+                  
+
+                    <img 
+                      v-if="selectedAnimation.illustration" 
+                      :src="selectedAnimation.illustration.url" 
+                      :alt="selectedAnimation.titre"
+                      class="detail-illustration"
+                    >
+                    <!--<a href="#" class="support-btn">Support</a>-->
+
                   <div class="hero-content">
                     <h2>{{ selectedAnimation.titre }}</h2>
                     <p class="auteur">{{ selectedAnimation.auteur }}</p>
+                    <div class="support-container">
+                      <p v-if="selectedAnimation.lien_projet" class="support-btn"><a :href="selectedAnimation.lien_projet" target="_blank" rel="noopener noreferrer">Voir le projet +</a></p>
+                      <p v-if="selectedAnimation.lien_createur" class="creator-link"><a :href="selectedAnimation.lien_createur" target="_blank" rel="noopener noreferrer">Lien du real</a></p>
+                    </div>
                     <p>Origine {{ selectedAnimation.origine_animation }}</p>
-                    <p class="detail-date"><span>{{ selectedAnimation.date_sortie }}</span></p>
+                    <p v-if="!selectedAnimation.date_sortie || (selectedAnimation.date_sortie) === 0" class="detail-date"><span>Date de sortie inconnue</span></p>
+                    <p v-else class="detail-date"><span>{{ selectedAnimation.date_sortie }}</span></p>
                     <div class="hero-tag">
                       <p
-                          v-for="genre in selectedAnimation.taxonomies.slice(0, 2)" 
+                          v-for="genre in selectedAnimation.taxonomies.slice(0, 3)" 
                           :key="genre.term_id" 
                           class="genre-tag"
                         >
                           {{ genre.name }}
                       </p>
                     </div>
-                  </div>
+                </div>
 
 
               </div>
               
               <div class="first-part">
                 <div class="infos-format">
-                  <p><img src="@/assets/clock-icon.svg" alt="" aria-hidden="true" />~{{ selectedAnimation.duree_episode }} min / episode</p>
 
-                  <p v-if="selectedAnimation.nombre_episode > 1 || !selectedAnimation.type_contenu?.some(t => ['court métrage', 'film'].includes(t.name.toLowerCase()))">
+                  <p v-if="!selectedAnimation.duree_episode || Number(selectedAnimation.duree_episode) === 0">
+                    Durée inconnu
+                  </p>
+                  
+                  <p v-else><img src="@/assets/clock-icon.svg" alt="" aria-hidden="true" />~{{ selectedAnimation.duree_episode }} min / episode </p>
+                  
+                  <p v-if="!selectedAnimation.nombre_episode || Number(selectedAnimation.nombre_episode) === 0">
+                    Nombre d'épisodes inconnu
+                  </p>
+
+                  <p v-else-if="selectedAnimation.nombre_episode > 1 || !selectedAnimation.type_contenu?.some(t => ['court métrage', 'film', 'clip musical'].includes(t.name.toLowerCase()))">
                     {{ selectedAnimation.nombre_episode }} épisode{{ selectedAnimation.nombre_episode > 1 ? 's' : '' }}
                   </p>
 
                   <p v-if="!selectedAnimation.nombre_saisons || selectedAnimation.nombre_saisons == 0">
                     {{ 
-                        selectedAnimation.type_contenu?.find(t => ['court métrage', 'film'].includes(t.name.toLowerCase()))?.name 
+                        selectedAnimation.type_contenu?.find(t => ['court métrage', 'film', 'clip musical'].includes(t.name.toLowerCase()))?.name 
                         || selectedAnimation.type_contenu?.[0]?.name 
-                        || 'Format inconnu' 
+                        || 'Saison inconnu' 
                       }}
                   </p>
 
