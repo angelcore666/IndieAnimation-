@@ -15,10 +15,13 @@ const gsap = window.gsap
 const Flip = window.Flip
 const ScrollSmoother = window.ScrollSmoother
 const ScrollTrigger = window.ScrollTrigger
+const SplitText = window.SplitText
+const tiltImage = ref(null)
 
 if (gsap && Flip) {
   gsap.registerPlugin(Flip)
   gsap.registerPlugin(ScrollSmoother, ScrollTrigger)
+  gsap.registerPlugin(SplitText)
 }
 
 const infos = ref([]) 
@@ -123,10 +126,72 @@ const listGenres = computed(() => {
 
 
 // function triggered on click to load a details page of an animation
-const selectAnimation = (animation) => {
+const selectAnimation = async (animation) => {
   window.scrollTo({top: 0,}) //puts back to the top
 
   selectedAnimation.value = animation //store the obj directly
+
+  await nextTick()
+  
+  gsap.fromTo(".infos-hero img, .infos-hero h2, .infos-hero p, .infos-hero figure, .infos-hero figcaption", 
+    {
+      y: 50,
+      opacity: 0
+    },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      delay: 0.1,
+      ease: "power2.out",
+      onComplete: () => {
+
+        gsap.set(".infos-hero img, .infos-hero h2, .infos-hero p, .infos-hero figure, .infos-hero figcaption", { clearProps: "opacity" })
+      }
+    }
+  )
+
+  gsap.fromTo(".first-part, .video", 
+    {
+      scrollTrigger: {
+        trigger: ".first-part, .video",
+        start: "top 50%",
+      },
+      y: 50,
+      opacity: 0
+    },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      delay: 0.3,
+      ease: "power2.out",
+      onComplete: () => {
+        gsap.set(".first-part, .video", { clearProps: "opacity" })
+      }
+    }
+  )
+
+  //description and synopsis text animation line per line
+  let split = SplitText.create(".split", {
+    type: "lines"
+  })
+
+  gsap.from(split.lines, {
+    scrollTrigger: {
+      trigger: ".split",
+      start: "top 65%",
+    },
+    y: 100,
+    autoAlpha: 0,
+    duration: 0.4,
+    stagger: 0.2,
+    ease: "power.out",
+    onComplete: () => {
+      gsap.set(split.lines, { clearProps: "opacity" })
+    }
+  })
+
 }
 
 //selected taxo and research
@@ -216,6 +281,38 @@ const resetToHome = () => {
 }
 
 
+// tilt effect for the image
+const handleTiltMove = (e) => {
+  if (!tiltImage.value) return
+
+  const rect = tiltImage.value.getBoundingClientRect()
+  
+  const x = (e.clientX - rect.left) / rect.width - 0.5
+  const y = (e.clientY - rect.top) / rect.height - 0.5
+
+  const maxRotation = 8
+
+  gsap.to(tiltImage.value, {
+    rotateY: x * maxRotation,
+    rotateX: -y * maxRotation,
+    duration: 0.3,
+    ease: 'power2.out',
+    transformPerspective: 800
+  })
+}
+
+const handleTiltLeave = () => {
+  if (!tiltImage.value) return
+
+  gsap.to(tiltImage.value, {
+    rotateX: 0,
+    rotateY: 0,
+    duration: 0.5,
+    ease: 'power2.out'
+  })
+}
+
+
 
 // do not forget that constants can be called in the class later
 // with v-for and v-if
@@ -226,9 +323,9 @@ const resetToHome = () => {
 <template>
  <main>
 
-    <indieheader v-if="$route.path !== '/infos'" :is-detail-view="selectedAnimation !== null" @go-home="resetToHome"/>
+    <indieheader v-if="$route.path !== '/about'" :is-detail-view="selectedAnimation !== null" @go-home="resetToHome"/>
 
-    <RouterView v-if="$route.path === '/infos'" />
+    <RouterView v-if="$route.path === '/about'" />
 
     <div v-else-if="!selectedAnimation" key="home-page">
 
@@ -274,6 +371,7 @@ const resetToHome = () => {
                       v-if="animation.illustration" 
                       :src="animation.illustration.url" 
                       :alt="animation.titre" 
+                      loading="lazy"
                       class="card-image"
                       @click="index === 0 ? cycleStack() : null" 
                       style="cursor: pointer;"
@@ -323,21 +421,30 @@ const resetToHome = () => {
             <div class="details">
               <div class="infos-hero">
                   
-
+                
                     <img 
                       v-if="selectedAnimation.illustration" 
                       :src="selectedAnimation.illustration.url" 
                       :alt="selectedAnimation.titre"
                       class="detail-illustration"
+                      loading="lazy"
+                      ref="tiltImage"
+                      @mousemove="handleTiltMove"
+                      @mouseleave="handleTiltLeave"
                     >
+                  
                     <!--<a href="#" class="support-btn">Support</a>-->
 
                   <div class="hero-content">
-                    <h2>{{ selectedAnimation.titre }}</h2>
+                    <figure>
+                      <img v-if="selectedAnimation.logo" :src="selectedAnimation.logo.url" :alt="selectedAnimation.logo" class="detail-logo">
+                      <figcaption v-if="selectedAnimation.logo">"{{ selectedAnimation.titre }}"</figcaption>
+                    </figure>
+                    <h2 v-if="!selectedAnimation.logo">{{ selectedAnimation.titre }}</h2>
                     <p class="auteur">{{ selectedAnimation.auteur }}</p>
                     <div class="support-container">
                       <p v-if="selectedAnimation.lien_projet" class="support-btn"><a :href="selectedAnimation.lien_projet" target="_blank" rel="noopener noreferrer">Voir le projet +</a></p>
-                      <p v-if="selectedAnimation.lien_createur" class="creator-link"><a :href="selectedAnimation.lien_createur" target="_blank" rel="noopener noreferrer">Lien du real</a></p>
+                      <p v-if="selectedAnimation.lien_createur" class="creator-link"><a :href="selectedAnimation.lien_createur" target="_blank" rel="noopener noreferrer">Lien du Real</a></p>
                     </div>
                     <p>Origine {{ selectedAnimation.origine_animation }}</p>
                     <p v-if="!selectedAnimation.date_sortie || (selectedAnimation.date_sortie) === 0" class="detail-date"><span>Date de sortie inconnue</span></p>
@@ -387,7 +494,7 @@ const resetToHome = () => {
                 
                 <div v-if="selectedAnimation.description" class="description-box">
                   <h3>Description</h3>
-                  <p>{{ selectedAnimation.description }}</p>
+                  <p class="split">{{ selectedAnimation.description }}</p>
                 </div>
               </div>
               
@@ -413,7 +520,7 @@ const resetToHome = () => {
 
                   <div v-if="selectedAnimation.synopsis" class="synopsis-box">
                     <h3>Synopsis</h3>
-                    <p>{{ selectedAnimation.synopsis }}</p>
+                    <p class="split">{{ selectedAnimation.synopsis }}</p>
                   </div>
                 </div>
               </div>
