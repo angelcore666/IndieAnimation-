@@ -1,0 +1,76 @@
+{
+  "list": {
+    "voir_plus": "Voir plus",
+    "rechercher": "Rechercher..."
+  },
+
+  "details": {
+    "origine": "Origine",
+    "date_inconnue": "Date de sortie inconnue",
+    "voir_projet": "Site Web",
+    "lien_real": "Lien du Real",
+    "duree_inconnue": "Durée inconnu",
+    "duree": "min / épisode",
+    "saison": "Saison",
+    "épisode": "Épisode",
+    "nombre_episode_inconnu": "Nb d'episode inconnue"
+  },
+
+  "apropos_page": {
+    "date_maj": "Dernière mise à jour : ",
+    "titre": "À propos"
+  },
+
+  
+  "taxonomies": {
+    "serie": "Série",
+    "court-metrage": "Court-métrage",
+    "film": "Film d'animation",
+    "clip-musical": "Clip musical",
+    "cartoon": "Cartoon",
+    "anime": "Anime",
+    "donghua": "Donghua",
+    "moyen-metrage": "Moyen métrage",
+
+    "_comment": "Gender part",
+
+    "absurde": "Absurde",
+    "action": "Action",
+    "alternative": "Alternative",
+    "aventure": "Aventure",
+    "boys-love": "Boy's love",
+    "comedie": "Comédie",
+    "coming-of-age": "Coming of age",
+    "cyberpunk": "Cyberpunk",
+    "drame": "Drame",
+    "edo-punk": "Edo-punk",
+    "ethno-cyberpunk": "Ethno cyberpunk",
+    "fantastique": "Fantastique",
+    "girl-love": "Girl love",
+    "girls-love": "Girl's love",
+    "historique": "Historique",
+    "horror": "Horror",
+    "j-pop": "J-pop",
+    "musical": "Musical",
+    "mythe": "Mythe",
+    "poetique": "Poétique",
+    "psychedelique": "Psychédédique",
+    "psychological": "Psychological",
+    "punk": "Punk",
+    "queer": "Queer",
+    "realiste": "Réaliste",
+    "romance": "Romance",
+    "samourai": "Samouraï",
+    "science-fiction": "Science Fiction",
+    "slice-of-life": "Slice of life",
+    "steampunk": "Steampunk",
+    "tribe": "Tribe"
+
+
+  },
+
+  "footer": {
+    "apropos": "À propos"
+  }
+
+}

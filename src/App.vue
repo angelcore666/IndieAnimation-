@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue'
+import { ref, onMounted, computed, nextTick} from 'vue'
 import axios from 'axios'
 import indieheader from '@/components/header.vue'
 import indiefooter from '@/components/footer.vue'
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 const $route = useRoute()
 const $router = useRouter() 
 //import of things like components
@@ -16,7 +17,7 @@ const Flip = window.Flip
 const ScrollSmoother = window.ScrollSmoother
 const ScrollTrigger = window.ScrollTrigger
 const SplitText = window.SplitText
-const tiltImage = ref(null)
+
 
 if (gsap && Flip) {
   gsap.registerPlugin(Flip)
@@ -28,6 +29,44 @@ const infos = ref([])
 const filtre = ref('')
 const selectGenre = ref(null)
 const selectedAnimation = ref(null)
+const tiltImage = ref(null)
+
+
+//internationalization text
+const { locale } = useI18n()
+const toggleLanguage = () => {
+  locale = locale === 'en' ? 'en' : 'fr'
+}
+
+function formatAnimationDate(ogDate, langue) {
+  if (!ogDate) return '';
+  
+  const date = new Date(ogDate);
+
+  const formatLang = langue === 'en' ? 'en-US' : 'fr-FR';
+
+  return new Intl.DateTimeFormat(langue, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(date);
+}
+
+function formatCountryName(countryCode, langue) {
+  if (!countryCode) return '';
+
+  if (countryCode === 'INT') {
+    return langue === 'en' ? 'International' : 'International';
+  }
+
+  try {
+    const formatLang = langue === 'en' ? 'en-US' : 'fr-FR';
+    return new Intl.DisplayNames([formatLang], { type: 'region' }).of(countryCode.toUpperCase());
+  } catch (error) {
+    return countryCode;
+  }
+}
+
 
 //get animation info with axios
 const fetchAnimations = async () => {
@@ -132,6 +171,13 @@ const selectAnimation = async (animation) => {
   selectedAnimation.value = animation //store the obj directly
 
   await nextTick()
+
+  gsap.from(".timer", {
+    innerText: 0,
+    duration: 3,
+    snap: { innerText: 1 },
+    ease: "power2.inOut",
+  });
   
   gsap.fromTo(".infos-hero img, .infos-hero h2, .infos-hero p, .infos-hero figure, .infos-hero figcaption", 
     {
@@ -155,7 +201,7 @@ const selectAnimation = async (animation) => {
     {
       scrollTrigger: {
         trigger: ".first-part, .video",
-        start: "top 50%",
+        start: "top 75%",
       },
       y: 50,
       opacity: 0
@@ -173,6 +219,7 @@ const selectAnimation = async (animation) => {
   )
 
   //description and synopsis text animation line per line
+  /*
   let split = SplitText.create(".split", {
     type: "lines"
   })
@@ -191,6 +238,7 @@ const selectAnimation = async (animation) => {
       gsap.set(split.lines, { clearProps: "opacity" })
     }
   })
+  */
 
 }
 
@@ -314,7 +362,8 @@ const handleTiltLeave = () => {
 
 
 
-// do not forget that constants can be called in the class later
+
+// do not forget that constants can be called in the balise later
 // with v-for and v-if
 
 </script>
@@ -332,7 +381,7 @@ const handleTiltLeave = () => {
       <div class="general-search">
       <!-- search part-->
         <div class="search-bar">
-          <input type="search" placeholder="Rechercher..." v-model="filtre">
+          <input type="search" :placeholder="$t('list.rechercher')" v-model="filtre">
         </div>
 
         <!-- gender skibidi list-->
@@ -340,7 +389,7 @@ const handleTiltLeave = () => {
             <button class="genre-item-list":class="{active: selectGenre === null}" @click="selectGenre = null">Tout</button>
 
             <button class="genre-item-list" v-for="genre in listGenres" :key="genre.term_id" :class="{ active: selectGenre?.term_id === genre.term_id }" @click="selectGenre = genre">
-              {{ genre.name }}
+              {{ $t(`taxonomies.${genre.slug}`, genre.name) }}
             </button>
 
         </div>
@@ -358,7 +407,18 @@ const handleTiltLeave = () => {
                   Randomizer
             </button>
 
-            <div class="card-container">
+            <div v-if="!filteredAnimations || filteredAnimations.length === 0" class="loading-list">
+              <lottie-player 
+                  class="loader-player"
+                  src="/indieanimation/animation/loader-animation.json"
+                  background="transparent"
+                  speed="1"
+                  loop
+                  autoplay>
+              </lottie-player>
+          </div>
+
+            <div v-else class="card-container">
               
                   <div 
                     v-for="(animation, index) in filteredAnimations" 
@@ -369,37 +429,38 @@ const handleTiltLeave = () => {
                   
                     <img 
                       v-if="animation.illustration" 
-                      :src="animation.illustration.url" 
-                      :alt="animation.titre" 
-                      loading="lazy"
+                      :src="animation.illustration" 
+                      :alt="'Affiche du projet d\'animation ' + animation.titre" 
+                      fetchpriority="high"
                       class="card-image"
                       @click="index === 0 ? cycleStack() : null" 
                       style="cursor: pointer;"
+
                     >
                     <div class="card-content" >
                       
                       <h3 @click="index === 0 ? cycleStack() : null" 
                       style="cursor: pointer;" >{{ animation.titre }}</h3>
 
-                      <p v-if="!animation.date_sortie || animation.date_sortie === '0'" class="date-tag"><img src="@/assets/calendar-icon.svg" alt="Calendar" /><span>Date inconnue</span></p>
+                      <p v-if="!animation.date_sortie || animation.date_sortie === '0'" class="date-tag"><img src="@/assets/calendar-icon.svg" alt="Calendar" /><span>{{ $t('details.date_inconnue') }}</span></p>
                       
-                      <p v-else class="date-tag"><img src="@/assets/calendar-icon.svg" alt="Calendar" /><span>{{animation.date_sortie}}</span></p>
+                      <p v-else class="date-tag"><img src="@/assets/calendar-icon.svg" alt="Calendar" /><span>{{ formatAnimationDate(animation.date_sortie, locale) }}</span></p>
                       
                       <div class="tags-container">
                         <p class="genre-tag"
                         v-for="genre in animation.taxonomies.slice(0, 3)"
-                        :key="genre.term_id">{{ genre.name }}</p>
+                        :key="genre.term_id">{{ $t(`taxonomies.${genre.slug}`, genre.name) }}</p>
                       </div>
 
 
                       <div class="tags-container">
                         <p class="type-tag"
                         v-for="(type,index) in animation.type_contenu"
-                        :key="type.term_id">{{ type.name }}<span v-if="index < animation.type_contenu.length - 1">, </span></p>
+                        :key="type.term_id">{{ $t(`taxonomies.${type.slug}`, type.name) }}<span v-if="index < animation.type_contenu.length - 1">, </span></p>
                       </div>
 
                       <button class="button-card" @click="selectAnimation(animation)">
-                        Voir plus
+                        {{ $t('list.voir_plus') }}
                       </button>
 
                     </div>
@@ -415,7 +476,7 @@ const handleTiltLeave = () => {
 
           <div class="detail-content">
             <div class="detail-banner">
-              <img v-if="selectedAnimation.image_banniere" :src="selectedAnimation.image_banniere.url" :alt="selectedAnimation.titre">
+              <img v-if="selectedAnimation.image_banniere" :src="selectedAnimation.image_banniere" :alt="selectedAnimation.titre">
             </div>
 
             <div class="details">
@@ -424,10 +485,10 @@ const handleTiltLeave = () => {
                 
                     <img 
                       v-if="selectedAnimation.illustration" 
-                      :src="selectedAnimation.illustration.url" 
-                      :alt="selectedAnimation.titre"
+                      :src="selectedAnimation.illustration" 
+                      :alt="'Affiche du projet d\'animation ' + selectedAnimation.titre"
                       class="detail-illustration"
-                      loading="lazy"
+                      fetchpriority="high"
                       ref="tiltImage"
                       @mousemove="handleTiltMove"
                       @mouseleave="handleTiltLeave"
@@ -437,25 +498,92 @@ const handleTiltLeave = () => {
 
                   <div class="hero-content">
                     <figure>
-                      <img v-if="selectedAnimation.logo" :src="selectedAnimation.logo.url" :alt="selectedAnimation.logo" class="detail-logo">
+                      <img v-if="selectedAnimation.logo" :src="selectedAnimation.logo" :alt="selectedAnimation.logo" class="detail-logo">
                       <figcaption v-if="selectedAnimation.logo">"{{ selectedAnimation.titre }}"</figcaption>
                     </figure>
                     <h2 v-if="!selectedAnimation.logo">{{ selectedAnimation.titre }}</h2>
                     <p class="auteur">{{ selectedAnimation.auteur }}</p>
+
                     <div class="support-container">
-                      <p v-if="selectedAnimation.lien_projet" class="support-btn"><a :href="selectedAnimation.lien_projet" target="_blank" rel="noopener noreferrer">Voir le projet +</a></p>
-                      <p v-if="selectedAnimation.lien_createur" class="creator-link"><a :href="selectedAnimation.lien_createur" target="_blank" rel="noopener noreferrer">Lien du Real</a></p>
+                      <p v-if="selectedAnimation.lien_projet" class="support-btn"><a :href="selectedAnimation.lien_projet" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-globe"></i>{{ $t('details.voir_projet') }}</a></p>
+
+                      <p v-if="selectedAnimation.lien_createur" class="creator-link"><a :href="selectedAnimation.lien_createur" target="_blank" rel="noopener noreferrer">{{ $t('details.lien_real') }}</a></p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.youtube" class="youtube-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.youtube" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i>YouTube</a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.tiktok" class="tiktok-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.tiktok" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-tiktok"></i>TikTok</a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.instagram" class="instagram-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.instagram" target="_blank" rel="noopener noreferrer">
+                          <i class="fa-brands fa-instagram"></i> Instagram
+                        </a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.twitter" class="twitter-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.twitter" target="_blank" rel="noopener noreferrer">
+                          <i class="fa-brands fa-x-twitter"></i> Twitter
+                        </a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.patreon" class="patreon-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.patreon" target="_blank" rel="noopener noreferrer">
+                          <i class="fa-brands fa-patreon"></i> Patreon
+                        </a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.kickstarter" class="kickstarter-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.kickstarter" target="_blank" rel="noopener noreferrer">
+                          <i class="fa-brands fa-kickstarter"></i> Kickstarter
+                        </a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.bilibili" class="bilibili-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.bilibili" target="_blank" rel="noopener noreferrer">
+                          <i class="fa-brands fa-bilibili"></i> Bilibili
+                        </a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.vimeo" class="vimeo-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.vimeo" target="_blank" rel="noopener noreferrer">
+                          <i class="fa-brands fa-vimeo-v"></i> Vimeo
+                        </a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.newgrounds" class="newgrounds-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.newgrounds" target="_blank" rel="noopener noreferrer">
+                          <img src="@/assets/newgrounds.png" alt="Newgrounds icon" class="icon-btn"> Newgrounds
+                        </a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.linktree" class="linktree-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.linktree" target="_blank" rel="noopener noreferrer">
+                          <img src="@/assets/linktree-icon.webp" alt="Linktree icon" class="icon-btn"> Linktree
+                        </a>
+                      </p>
+
+
                     </div>
-                    <p>Origine {{ selectedAnimation.origine_animation }}</p>
-                    <p v-if="!selectedAnimation.date_sortie || (selectedAnimation.date_sortie) === 0" class="detail-date"><span>Date de sortie inconnue</span></p>
-                    <p v-else class="detail-date"><span>{{ selectedAnimation.date_sortie }}</span></p>
+                    
+                    <p>{{ $t('details.origine') }} {{ formatCountryName(selectedAnimation.origine_animation, locale) }}</p>
+
+                    <p v-if="!selectedAnimation.date_sortie || selectedAnimation.date_sortie === '0000-00-00' || selectedAnimation.date_sortie === 0" class="detail-date">
+                      <span>{{ $t('details.date_inconnue') }}</span>
+                    </p>
+                    <p v-else class="detail-date">
+                      <span>{{ formatAnimationDate(selectedAnimation.date_sortie, locale) }}</span>
+                    </p>
+
                     <div class="hero-tag">
                       <p
                           v-for="genre in selectedAnimation.taxonomies.slice(0, 3)" 
                           :key="genre.term_id" 
                           class="genre-tag"
                         >
-                          {{ genre.name }}
+                          {{ $t(`taxonomies.${genre.slug}`, genre.name) }}
                       </p>
                     </div>
                 </div>
@@ -467,34 +595,43 @@ const handleTiltLeave = () => {
                 <div class="infos-format">
 
                   <p v-if="!selectedAnimation.duree_episode || Number(selectedAnimation.duree_episode) === 0">
-                    Durée inconnu
+                    {{ $t('details.duree_inconnue') }}
                   </p>
                   
-                  <p v-else><img src="@/assets/clock-icon.svg" alt="" aria-hidden="true" />~{{ selectedAnimation.duree_episode }} min / episode </p>
+                  <p v-else><img src="@/assets/clock-icon.svg" alt="" aria-hidden="true" />~<span class="timer">{{ selectedAnimation.duree_episode }}</span> {{ $t('details.duree') }} </p>
                   
                   <p v-if="!selectedAnimation.nombre_episode || Number(selectedAnimation.nombre_episode) === 0">
-                    Nombre d'épisodes inconnu
+                    {{ $t('details.nombre_episode_inconnu') }}
                   </p>
 
-                  <p v-else-if="selectedAnimation.nombre_episode > 1 || !selectedAnimation.type_contenu?.some(t => ['court métrage', 'film', 'clip musical'].includes(t.name.toLowerCase()))">
-                    {{ selectedAnimation.nombre_episode }} épisode{{ selectedAnimation.nombre_episode > 1 ? 's' : '' }}
+                  <p v-else-if="selectedAnimation.nombre_episode > 1 || !selectedAnimation.type_contenu?.some(t => ['court-metrage', 'film', 'clip-musical'].includes(t.slug))"><span class="timer">
+                    {{ selectedAnimation.nombre_episode }}</span> {{ $t('details.épisode') }}{{ selectedAnimation.nombre_episode > 1 ? 's' : '' }}
                   </p>
 
                   <p v-if="!selectedAnimation.nombre_saisons || selectedAnimation.nombre_saisons == 0">
                     {{ 
-                        selectedAnimation.type_contenu?.find(t => ['court métrage', 'film', 'clip musical'].includes(t.name.toLowerCase()))?.name 
-                        || selectedAnimation.type_contenu?.[0]?.name 
-                        || 'Saison inconnu' 
-                      }}
+                      (() => {
+                        
+                        const format = selectedAnimation.type_contenu?.find(t => 
+                          ['court-metrage', 'film', 'clip-musical'].includes(t.slug)
+                        );
+
+                        const slugDisplay = format?.slug || selectedAnimation.type_contenu?.[0]?.slug;
+
+                        return slugDisplay 
+                          ? $t(`taxonomies.${slugDisplay}`) 
+                          : $t('details.format_inconnu', 'Format inconnu');
+                      })()
+                    }}
                   </p>
 
-                  <p v-else>{{ selectedAnimation.nombre_saisons }} Saison{{ selectedAnimation.nombre_saisons > 1 ? 's' : '' }}</p>
+                  <p v-else><span class="timer">{{ selectedAnimation.nombre_saisons }}</span> Saison{{ selectedAnimation.nombre_saisons > 1 ? 's' : '' }}</p>
                 </div>
 
                 
-                <div v-if="selectedAnimation.description" class="description-box">
+                <div v-if="selectedAnimation && selectedAnimation['description_' + $i18n.locale]" class="description-box">
                   <h3>Description</h3>
-                  <p class="split">{{ selectedAnimation.description }}</p>
+                  <p class="split">{{ selectedAnimation['description_' + $i18n.locale] }}</p>
                 </div>
               </div>
               
@@ -518,9 +655,9 @@ const handleTiltLeave = () => {
                     allowfullscreen
                   ></iframe>
 
-                  <div v-if="selectedAnimation.synopsis" class="synopsis-box">
-                    <h3>Synopsis</h3>
-                    <p class="split">{{ selectedAnimation.synopsis }}</p>
+                  <div v-if="selectedAnimation && selectedAnimation['synopsis_' + $i18n.locale]" class="synopsis-box">
+                      <h3>Synopsis</h3>
+                      <p class="split">{{ selectedAnimation['synopsis_' + $i18n.locale] }}</p>
                   </div>
                 </div>
               </div>
@@ -532,6 +669,8 @@ const handleTiltLeave = () => {
           </div>
 
     </div>
+
+    
 
     <indiefooter @go-home="resetToHome"/>
 

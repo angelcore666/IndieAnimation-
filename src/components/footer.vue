@@ -6,7 +6,7 @@
         <img src="@/assets/logo-indieanimation.png" alt="IndieAnimation" class="logo-footer">
       </figure>
       <p><RouterLink to="/about" class="nav-btn-infos">
-          About
+          {{ $t('footer.apropos') }}
         </RouterLink>©2026 IndieAnimation+</p>
    </footer>
    
