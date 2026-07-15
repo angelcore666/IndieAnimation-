@@ -78,7 +78,7 @@
         <div class="icon" @mouseenter="setRandomRotate"
             @mouseleave="resetRotate">
             <a href="https://www.tiktok.com/@holyestrogen" target="_blank" rel="noopener noreferrer"><img src="@/assets/just_mEEE.png" alt="meeeeeeeeeeeeeee"></a>
-            <span class="hover-text">W3irdogrl_</span>
+            <span class="hover-text">@holyestrogen</span>
         </div>
 
         <div v-html="infoPage.content.rendered" class="infos-content"></div>
