@@ -502,7 +502,29 @@ const handleTiltLeave = () => {
                       <figcaption v-if="selectedAnimation.logo">"{{ selectedAnimation.titre }}"</figcaption>
                     </figure>
                     <h2 v-if="!selectedAnimation.logo">{{ selectedAnimation.titre }}</h2>
-                    <p class="auteur">{{ selectedAnimation.auteur }}</p>
+
+                    <p class="auteur" v-if="selectedAnimation.auteurs === undefined || selectedAnimation.auteurs.length === 0">{{ selectedAnimation.auteur }}</p>
+
+                    <p class="auteur" v-if="selectedAnimation.auteurs && selectedAnimation.auteurs.length">
+                      
+                      <span 
+                        v-for="(auteur, index) in selectedAnimation.auteurs" 
+                        :key="index"
+                      >
+                        <a 
+                          v-if="auteur.lien" 
+                          :href="auteur.lien" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          {{ auteur.nom }}
+                        </a>
+
+                        <span v-else>{{ auteur.nom }}</span>
+
+                        <span v-if="index < selectedAnimation.auteurs.length - 1">, </span>
+                      </span>
+                    </p>
 
                     <div class="support-container">
                       <p v-if="selectedAnimation.lien_projet" class="support-btn"><a :href="selectedAnimation.lien_projet" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-globe"></i>{{ $t('details.voir_projet') }}</a></p>
@@ -520,6 +542,12 @@ const handleTiltLeave = () => {
                       <p v-if="selectedAnimation.reseaux_sociaux?.instagram" class="instagram-link">
                         <a :href="selectedAnimation.reseaux_sociaux.instagram" target="_blank" rel="noopener noreferrer">
                           <i class="fa-brands fa-instagram"></i> Instagram
+                        </a>
+                      </p>
+
+                      <p v-if="selectedAnimation.reseaux_sociaux?.soundcloud" class="soundcloud-link social-link">
+                        <a :href="selectedAnimation.reseaux_sociaux.soundcloud" target="_blank" rel="noopener noreferrer">
+                          <i class="fa-brands fa-soundcloud"></i> SoundCloud
                         </a>
                       </p>
 
@@ -636,7 +664,7 @@ const handleTiltLeave = () => {
               </div>
               
               <div class="video">
-                <div v-if="selectedAnimation.lien_bande_annonce" class="video-container">
+                <div class="video-container">
                   <!--<h3>Bande-annonce / Film</h3>-->
                   <svg xmlns="http://www.w3.org/2000/svg" width="47" height="39" viewBox="0 0 47 39" fill="none">
                     <path class="eye-contour" d="M38.2562 30.7691C38.2564 30.7685 38.2558 30.7679 38.2552 30.768L29.7081 32.4797C22.9325 33.8359 15.8962 32.606 9.98367 29.0306L4.67156 25.818C4.47157 25.697 4.50534 25.3973 4.72722 25.3238L14.7587 22.0041C19.2586 20.5141 24.1951 21.2049 28.1147 23.8718L38.2548 30.7697C38.2554 30.77 38.2561 30.7697 38.2562 30.7691Z" fill="white" stroke="#D300FF" stroke-width="2.65547" stroke-miterlimit="10"/>
@@ -645,7 +673,7 @@ const handleTiltLeave = () => {
                     <path d="M21.7771 15.0557C21.8641 13.6542 22.8051 13.717 22.8916 12.3182C22.9787 10.9167 22.035 10.8534 22.1188 9.45406C22.2027 8.05474 23.1469 8.11531 23.234 6.71381C23.321 5.31232 22.3774 5.24899 22.4617 3.84692" stroke="#D300FF" stroke-width="2.09924" stroke-miterlimit="10" stroke-linecap="round"/>
                     <path d="M31.38 19.0568C32.3796 18.0985 33.0269 18.8059 34.0238 17.847C35.0234 16.8887 34.3761 16.1813 35.3731 15.2224C36.3727 14.2641 37.0199 14.9715 38.0168 14.0126C39.0164 13.0543 38.3692 12.3469 39.3661 11.388" stroke="#D300FF" stroke-width="2.09924" stroke-miterlimit="10" stroke-linecap="round"/>
                   </svg>
-                  <iframe 
+                  <iframe v-if="selectedAnimation.lien_bande_annonce"
                     width="100%" 
                     height="450" 
                     :src="getEmbedUrl(selectedAnimation.lien_bande_annonce)" 
@@ -654,6 +682,14 @@ const handleTiltLeave = () => {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                     allowfullscreen
                   ></iframe>
+
+                  <div id="video-container-vertical" v-if="selectedAnimation.lien_video_tiktok">
+                    <iframe 
+                      :src="`https://www.tiktok.com/player/v1/${selectedAnimation.lien_video_tiktok}?description=0&music_info=0`" 
+                      allow="autoplay; fullscreen" 
+                      scrolling="no">
+                    </iframe>
+                  </div>
 
                   <div v-if="selectedAnimation && selectedAnimation['synopsis_' + $i18n.locale]" class="synopsis-box">
                       <h3>Synopsis</h3>

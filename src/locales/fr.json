@@ -13,7 +13,8 @@
     "duree": "min / épisode",
     "saison": "Saison",
     "épisode": "Épisode",
-    "nombre_episode_inconnu": "Nb d'episode inconnue"
+    "nombre_episode_inconnu": "Nb d'episode inconnue",
+    "crée_par": "Créé par "
   },
 
   "apropos_page": {
@@ -64,8 +65,10 @@
     "science-fiction": "Science Fiction",
     "slice-of-life": "Slice of life",
     "steampunk": "Steampunk",
-    "tribe": "Tribe"
-
+    "tribe": "Tribe",
+    "transidentite": "Transidentité",
+    "jeunesse": "Jeunesse",
+    "nostalgie": "Nostalgie"
 
   },
 
