@@ -311,6 +311,8 @@ nav figure img {
     width: 100%;
     padding: 10px 15px;
     border: none;
+    background-color: var(--tertiary-color);
+    color: var(--primary-color);
     border-radius: 25px;
     font-family: 'Fira-medium', sans-serif;
     font-size: 16px;
@@ -1067,8 +1069,9 @@ iframe {
 .related-section {
   width: 100%;
   overflow: visible;
-  margin-top: 48px;
-  margin-left: 125px;
+  margin-top: 110px;
+  margin-left: 120px;
+  margin-bottom: 50px;
 }
 
 .related-section .section-title {
@@ -1087,13 +1090,13 @@ iframe {
 
 .cards-swiper::part(container) {
   overflow: visible !important;
+  
 }
 
 .anim-slide {
-  width: 280px !important;
-  max-width: 280px !important;
+  width: 400px !important;
+  max-width: 400px !important;
   flex-shrink: 0;
-
 }
 
 .anim-card {
@@ -1107,8 +1110,9 @@ iframe {
 }
 
 .card-thumbnail {
+  position: relative;
   width: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   background-color: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1120,6 +1124,27 @@ iframe {
   display: block;
   object-fit: contain;
   transition: transform 0.3s ease;
+}
+
+.video-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: none;
+  pointer-events: none;
+  z-index: 2;
+
+  opacity: 0;
+  transform: scale(1.2); 
+  transition: opacity 0.8s ease-in-out;
+
+}
+
+.video-preview.is-visible {
+  opacity: 1;
 }
 
 .card-info {
@@ -1144,7 +1169,7 @@ iframe {
 }
 
 .card-genre {
-  color: #a0a0a0;
+  color: var(--tertiary-color);
   font-size: 0.85rem;
   margin-top: 4px;
   margin-bottom: 0;
@@ -1163,7 +1188,6 @@ iframe {
     font-size: 1.60rem;
   }
 }
-
 
 /*footer*/
 footer {

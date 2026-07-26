@@ -219,6 +219,18 @@ const selectAnimation = async (animation) => {
 
   )
 
+  window.gsap.from('.anim-slide', {
+      scrollTrigger: {
+        trigger: '.anim-slide',
+        start: 'top 80%',
+      },
+      duration: 1,
+      x: -40,
+      opacity: 0,
+      stagger: 0.08,
+      ease: 'power2.out'
+    })
+
   setTimeout(() => {
     initHorizontalScroll()
   }, 300)
@@ -286,7 +298,29 @@ const randomizeStack = () => {
 
 }
 
-// fonction pour transformer un lien YouTube classique en lien "embed" pour l'iframe
+const hoveredCard = ref(null)
+
+const isPreviewReady = ref(false)
+let hoverTimer = null
+
+const handleMouseEnter = (anim) => {
+  if (anim && anim.titre) {
+    hoveredCard.value = anim.titre
+    isPreviewReady.value = false
+    
+    clearTimeout(hoverTimer)
+    hoverTimer = setTimeout(() => {
+      isPreviewReady.value = true
+    }, 4800)
+  }
+}
+
+const handleMouseLeave = () => {
+  clearTimeout(hoverTimer)
+  hoveredCard.value = null
+  isPreviewReady.value = false
+}
+
 const getEmbedUrl = (url) => {
   if (!url) return ''
   
@@ -300,6 +334,23 @@ const getEmbedUrl = (url) => {
   if (url.includes('v=')) {
     const id = url.split('v=')[1].split('&')[0]
     return `https://www.youtube.com/embed/${id}`
+  }
+  
+  return url
+}
+
+const getPreviewUrl = (url) => {
+  if (!url) return ''
+  
+  let id = ''
+  if (url.includes('youtu.be/')) {
+    id = url.split('youtu.be/')[1].split('?')[0]
+  } else if (url.includes('v=')) {
+    id = url.split('v=')[1].split('&')[0]
+  }
+
+  if (id) {
+    return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}`
   }
   
   return url
@@ -343,25 +394,22 @@ const handleTiltLeave = () => {
   })
 }
 
-// computed property to get similar animations based on shared genres
 const similarAnimations = computed(() => {
   if (!selectedAnimation.value || !selectedAnimation.value.taxonomies || !selectedAnimation.value.taxonomies.length) {
     return []
   }
 
-  // Récupère les IDs de genres de l'animation courante
   const genresActuelsIds = selectedAnimation.value.taxonomies.map(t => t.term_id)
 
-  // Filtre la liste globale des animations
   return infos.value.filter(anim => {
-    // Exclure l'animation courante
+
     if (anim.titre === selectedAnimation.value.titre) return false
 
-    // Vérifier si elle partage au moins un genre
     if (!anim.taxonomies) return false
     return anim.taxonomies.some(genre => genresActuelsIds.includes(genre.term_id))
-  })// tout
+  }).slice(0, 10) 
 })
+
 
 
 
@@ -721,10 +769,24 @@ const similarAnimations = computed(() => {
                       :key="anim.titre" 
                       class="anim-slide"
                     >
-                      <div class="anim-card" @click="selectAnimation(anim)">
+                      <div class="anim-card" @click="selectAnimation(anim)"
+                        @mouseenter="handleMouseEnter(anim)"
+                        @mouseleave="handleMouseLeave"
+                      >
                         
                         <div class="card-thumbnail">
                           <img :src="anim.image_banniere || anim.image" :alt="anim.titre" />
+
+                          <iframe
+                            v-if="hoveredCard === anim.titre && anim.lien_bande_annonce"
+                            :src="getPreviewUrl(anim.lien_bande_annonce)"
+                            class="video-preview"
+                            :class="{ 'is-visible': isPreviewReady }"
+                            frameborder="0"
+                            allow="autoplay; encrypted-media"
+                            
+                          ></iframe>
+
                         </div>
 
                         <div class="card-info">
