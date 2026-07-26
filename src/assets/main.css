@@ -1063,7 +1063,7 @@ iframe {
     border: none;
 }
 
-/* Section globale */
+/*related section*/
 .related-section {
   width: 100%;
   overflow: visible;
@@ -1071,7 +1071,6 @@ iframe {
   margin-left: 125px;
 }
 
-/* Titre de la section */
 .related-section .section-title {
   color: var(--tertiary-color);
   font-size: 1.85rem;
@@ -1123,7 +1122,6 @@ iframe {
   transition: transform 0.3s ease;
 }
 
-/* Bloc d'informations */
 .card-info {
   margin-top: 12px;
 }
@@ -1152,15 +1150,13 @@ iframe {
   margin-bottom: 0;
 }
 
-/* 📱 Sur Téléphone & Tablette */
 @media (max-width: 849px) {
   .related-section {
     margin-left: 0;
-    padding-left: 16px; /* Donne de l'air sur mobile */
+    padding-left: 16px;
   }
 }
 
-/* Responsive : ajustement pour petit écran (Mobile) */
 @media (max-width: 600px) {
 
   .related-section .section-title {
