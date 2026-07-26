@@ -67,6 +67,8 @@ html {
 body {
     background-color: var(--primary-color);
     margin: 0;
+    overflow-x: hidden;
+    padding: 0;
 }
 
 /*main container*/
@@ -1059,6 +1061,111 @@ iframe {
     width: 100%;
     height: 100%;
     border: none;
+}
+
+/* Section globale */
+.related-section {
+  width: 100%;
+  overflow: visible;
+  margin-top: 48px;
+  margin-left: 125px;
+}
+
+/* Titre de la section */
+.related-section .section-title {
+  color: var(--tertiary-color);
+  font-size: 1.85rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+}
+
+.cards-swiper {
+  width: 100%;
+  padding-bottom: 14px;
+  overflow: visible;
+}
+
+.cards-swiper::part(container) {
+  overflow: visible !important;
+}
+
+.anim-slide {
+  width: 280px !important;
+  max-width: 280px !important;
+  flex-shrink: 0;
+
+}
+
+.anim-card {
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-thumbnail {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-thumbnail img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+/* Bloc d'informations */
+.card-info {
+  margin-top: 12px;
+}
+
+.card-logo {
+  max-height: 55px;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.card-title {
+  color: var(--tertiary-color);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-genre {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* 📱 Sur Téléphone & Tablette */
+@media (max-width: 849px) {
+  .related-section {
+    margin-left: 0;
+    padding-left: 16px; /* Donne de l'air sur mobile */
+  }
+}
+
+/* Responsive : ajustement pour petit écran (Mobile) */
+@media (max-width: 600px) {
+
+  .related-section .section-title {
+    font-size: 1.60rem;
+  }
 }
 
 

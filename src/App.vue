@@ -216,29 +216,12 @@ const selectAnimation = async (animation) => {
         gsap.set(".first-part, .video", { clearProps: "opacity" })
       }
     }
+
   )
 
-  //description and synopsis text animation line per line
-  /*
-  let split = SplitText.create(".split", {
-    type: "lines"
-  })
-
-  gsap.from(split.lines, {
-    scrollTrigger: {
-      trigger: ".split",
-      start: "top 65%",
-    },
-    y: 100,
-    autoAlpha: 0,
-    duration: 0.4,
-    stagger: 0.2,
-    ease: "power.out",
-    onComplete: () => {
-      gsap.set(split.lines, { clearProps: "opacity" })
-    }
-  })
-  */
+  setTimeout(() => {
+    initHorizontalScroll()
+  }, 300)
 
 }
 
@@ -359,6 +342,27 @@ const handleTiltLeave = () => {
     ease: 'power2.out'
   })
 }
+
+// computed property to get similar animations based on shared genres
+const similarAnimations = computed(() => {
+  if (!selectedAnimation.value || !selectedAnimation.value.taxonomies || !selectedAnimation.value.taxonomies.length) {
+    return []
+  }
+
+  // Récupère les IDs de genres de l'animation courante
+  const genresActuelsIds = selectedAnimation.value.taxonomies.map(t => t.term_id)
+
+  // Filtre la liste globale des animations
+  return infos.value.filter(anim => {
+    // Exclure l'animation courante
+    if (anim.titre === selectedAnimation.value.titre) return false
+
+    // Vérifier si elle partage au moins un genre
+    if (!anim.taxonomies) return false
+    return anim.taxonomies.some(genre => genresActuelsIds.includes(genre.term_id))
+  })// tout
+})
+
 
 
 
@@ -701,6 +705,50 @@ const handleTiltLeave = () => {
               
             </div>
 
+            <!--Section more in this style-->
+                <section v-if="similarAnimations && similarAnimations.length > 0" class="related-section">
+                  <h2 class="section-title">{{ $t('details.style_anim') || 'Plus dans ce style' }}</h2>
+
+                  <swiper-container
+                    slides-per-view="auto"
+                    space-between="11"
+                    mousewheel="true"
+                    free-mode="true"
+                    class="cards-swiper"
+                  >
+                    <swiper-slide 
+                      v-for="anim in similarAnimations" 
+                      :key="anim.titre" 
+                      class="anim-slide"
+                    >
+                      <div class="anim-card" @click="selectAnimation(anim)">
+                        
+                        <div class="card-thumbnail">
+                          <img :src="anim.image_banniere || anim.image" :alt="anim.titre" />
+                        </div>
+
+                        <div class="card-info">
+                          <img 
+                            v-if="anim.logo" 
+                            :src="anim.logo" 
+                            :alt="anim.titre" 
+                            class="card-logo"
+                          />
+
+                          <h3 v-else class="card-title">
+                            {{ anim.titre }}
+                          </h3>
+                          
+                          <p class="card-genre" v-if="anim.taxonomies && anim.taxonomies.length">
+                            {{ $t(`taxonomies.${anim.taxonomies[0].slug}`, anim.taxonomies[0].name) }}
+                          </p>
+                        </div>
+
+                      </div>
+                    </swiper-slide>
+                  </swiper-container>
+                </section>
+              
 
           </div>
 
